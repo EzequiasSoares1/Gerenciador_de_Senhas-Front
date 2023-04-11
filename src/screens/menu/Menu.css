@@ -1,0 +1,16 @@
+.text-delet p{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 15px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color:white;
+    font-size: 20px;
+}
+.table{
+    background-color:white;
+    color: black;
+}
+.table .table-active{
+    color: black;
+}

@@ -1,0 +1,12 @@
+Button{
+    width: 350px;
+    margin: 0 auto;
+    margin-top: 30px;
+    display: flex;
+    cursor: pointer;
+    text-align: center;
+}
+img{
+    margin-top: 2px;
+    margin-left: 10px;
+}
