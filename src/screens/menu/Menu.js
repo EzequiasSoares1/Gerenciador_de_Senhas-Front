@@ -74,6 +74,9 @@ export default class Main extends React.Component {
                 <li className="nav-item">
                   <a className="nav-link"   onClick={() => this.deleteData()}>Delete Password</a>
                 </li>
+                <li className="nav-item">
+                  <a className="nav-link"  href='/login'>Logout</a>
+                </li>
               </ul>
             </div>
           </div>
