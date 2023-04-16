@@ -5,39 +5,67 @@ import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Button from '../../components/Button';
 import Footer from'../../components/Footer';
-import axios from 'axios';
+import { showErrorMessage } from '../../components/Toastr';
+import UserApiService  from '../../services/UserApiService'
+
 
 export default class Login extends React.Component {
   
-    state = {
-        email:"",
-        password: "",
-    }
+  state = {
+      email:"",
+      password: "",
+  }
 
-    check = (log,pass) =>{
-      return this.state.email === log && this.state.password === pass;
-    }
+  check = (log,pass) =>{
+    return this.state.email === log && this.state.password === pass;
+  }
+  constructor(){
+    super();
+    this.service = new UserApiService();
+  }
+    
+  verify = () =>{
+    const erro = [];
 
-    seach = async () =>{
+    if(!this.state.email){
+      erro.push("Campo email é obrigatorio");
+    } 
+    else if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+      erro.push("Informe email valido");
+    }
+    if(!this.state.password){
+      erro.push("Campo password é obrigatorio");
+    }
+    return erro;
+  }
+
+  seach = () =>{
+    const erro = this.verify();
+    if(erro.length > 0){
+      erro.forEach((message) =>{
+        showErrorMessage(message);
+      });
+      return false;
+    } 
+    
+   this.service.findNoData(this.state.email)
+    .then(response =>
+    {
+      const user = response.data;
       
-      axios.get(`http://localhost:8080/api/user?login=${this.state.email}`)
-        .then(response =>
-        {
-        const user = response.data;
-        
-        if(this.check(user.login, user.password)){
-          localStorage.setItem('@user', JSON.stringify(user))
-          window.open("http://localhost:3000/home", '_self')   
-        }
-        else{
-          alert("Usuario não encontrado")
-        }
-        }
-        ).catch(erro =>{
-          alert("Usuario não encontrado")
-        }
-        );
+      if(this.check(user.login, user.password)){
+        localStorage.setItem('@user', JSON.stringify(user))
+        window.open("http://localhost:3000/home", '_self')   
       }
+      else{
+        showErrorMessage("Usuario não encontrado")
+      }
+    }).catch(erro =>{
+      showErrorMessage("Usuario não encontrado")
+      console.log(erro.response)
+    });
+    
+  }
     render(){
       return(
           <Header title="Login" p="Welcome Back!">

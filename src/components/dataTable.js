@@ -1,12 +1,14 @@
 import React from 'react';
+import { showSuccessMessage } from './Toastr';
+
+ 
+const salve = (e) =>{
+    localStorage.setItem('@data', JSON.stringify(e))
+    showSuccessMessage("Linha selecionada")
+} 
 
 export default props => { 
-    
-    const salve = (e) =>{
-        localStorage.setItem('@data', JSON.stringify(e))
-        alert("Linha selecionada")
-    } 
-    
+   
     const rows = props.datas.map( data =>{
         return(
             <tr  key={data.id} onClick={() => salve(data.id)}>

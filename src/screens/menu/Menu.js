@@ -1,22 +1,35 @@
 import React from 'react';
 import DataTable from '../../components/dataTable';
-import axios from 'axios';
 import "./Menu.css";
+import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
+import DataApiService  from '../../services/DataApiService'
+import UserApiService  from '../../services/UserApiService'
+
 
 export default class Main extends React.Component {
   state = {
-    data: []
+    data: [],
+    load: ""
+  }
+
+  constructor(){
+    super();
+    this.serviceUser = new UserApiService();
+    this.serviceData = new DataApiService();
   }
 
   getData = async() =>{
-    localStorage.setItem('@data', JSON.stringify(null))
-    if(this.state.data.length === 0){
+    if(!this.state.load){
+
+      localStorage.setItem('@data', JSON.stringify(null))
       const login = JSON.parse(localStorage.getItem('@user')).login;
-      await axios.get(`http://localhost:8080/api/user?login=${login}`)
+
+      this.serviceUser.find(login)
       .then(response =>
       {
         const data = response.data.dataService;
         this.setState({ data })
+        this.setState({load: "retggerg"});
       })
       .catch(erro =>
       {
@@ -29,28 +42,39 @@ export default class Main extends React.Component {
     const id = JSON.parse(localStorage.getItem('@data'));
     return id === null;
   }
+  
+
   windowEdit= () =>{
     if(this.checkerIsId()){
-      alert("Selecione uma linha da tabela")
+      showErrorMessage("Selecione uma linha da tabela")
     }else{
       window.open("http://localhost:3000/editData", '_self')
     }
   }
+
   deleteData = () =>{
-    const id = JSON.parse(localStorage.getItem('@data'));
+   
     if(this.checkerIsId()){
-      alert("Selecione uma linha da tabela")
+      showErrorMessage("Selecione uma linha da tabela")
     }else{
-      axios.delete(`http://localhost:8080/api/data/${id}`)
+      const id = JSON.parse(localStorage.getItem('@data')); 
+      this.serviceData.delete(id)
       .then(response => {
-        alert("Senha excluida")
-        window.location.reload()
+        showSuccessMessage("Senha excluida");
+        setTimeout(function(){
+          window.location.reload()
+        }, 1000);
       }
       ).catch(error => {
           console.log(error.response);
       }
       );
     }
+  }
+
+  logout = () =>{
+    localStorage.setItem('@data', JSON.stringify(null))
+    localStorage.setItem('@user', JSON.stringify(null))
   }
   
   render(){
@@ -75,20 +99,19 @@ export default class Main extends React.Component {
                   <a className="nav-link"   onClick={() => this.deleteData()}>Delete Password</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link"  href='/login'>Logout</a>
+                  <a className="nav-link"  onClick={() => this.logout()}href='/login'>Logout</a>
                 </li>
               </ul>
             </div>
           </div>
         </nav>
       </div>
-      <body className="body-table">
-        <div className="text-delet">
-            <p>Click na linha a qual deseja alterar ou excluir</p>
-          </div>
-        <DataTable className="table" datas={this.state.data}/>
-      </body>
+      <div className="text-delet">
+          <p>Click na linha a qual deseja alterar ou excluir</p>
+        </div>
+      <DataTable className="table" datas={this.state.data}/>        
       </>
     )
   }
 }
+

@@ -5,8 +5,8 @@ import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Button from '../../components/Button';
 import Footer from'../../components/Footer';
-import axios from 'axios';
-
+import UserApiService  from '../../services/UserApiService'
+import { showErrorMessage, showSuccessMessage} from '../../components/Toastr';
 export default class EditUser extends React.Component {
 
   state = {
@@ -14,7 +14,10 @@ export default class EditUser extends React.Component {
     password: "",
     telephone: ""
   }
-
+  constructor(){
+    super();
+    this.service = new UserApiService();
+  }
   check = () =>{
     return this.state.name === ""  || this.state.password === "";
   }
@@ -22,13 +25,25 @@ export default class EditUser extends React.Component {
   setData = (name, password, telephone) =>{
     this.setState({name: name,  password:password, telephone:telephone});
   }
+  
+  verify = () =>{
+    const erro = [];
+
+    if(!this.state.name){
+      erro.push("Campo nome é obrigatorio");
+    }
+    if(!this.state.password){
+      erro.push("Campo password é obrigatorio");
+    }
+    return erro;
+  }
 
   seach = async() =>{
 
     if(this.state.name === ""){
       const user = JSON.parse(localStorage.getItem('@user'));
 
-      await axios.get(`http://localhost:8080/api/user/noData?login=${user.login}`)
+      this.service.findNoData(user.login)
       .then(response =>
       {
         const userdt = response.data;
@@ -36,7 +51,7 @@ export default class EditUser extends React.Component {
       })
       .catch(erro =>
       {
-        alert("Usuario não encontrado")
+        showErrorMessage("Usuario não encontrado")
       }
       );
     }
@@ -44,41 +59,47 @@ export default class EditUser extends React.Component {
 
   update = async() =>{
 
-    if(this.check()){
-      alert("Verifique os campos");
-    } 
-    else{
-      const login = JSON.parse(localStorage.getItem('@user')).login;
-      const user = {
-        name: this.state.name,
-        login: login,
-        password: this.state.password,
-        telephone: this.state.telephone
-      }
-      await axios.put(`http://localhost:8080/api/user/${login}`,user
-      )
-      .then(response =>{
-        localStorage.setItem('@user', JSON.stringify(user))
-        alert("Dados cadastrados")
-        window.open("http://localhost:3000/home", '_self') 
-      })
-      .catch(erro =>
-      {        
-        alert(erro.response)
+    const erro = this.verify();
+    if(erro.length > 0){
+      erro.forEach((message) =>{
+        showErrorMessage(message);
       });
+      return false;
+    } 
+   
+    const login = JSON.parse(localStorage.getItem('@user')).login;
+    const user = {
+      name: this.state.name,
+      login: login,
+      password: this.state.password,
+      telephone: this.state.telephone
     }
+    this.service.update(`/${login}`,user)
+    .then(response =>{
+      localStorage.setItem('@user', JSON.stringify(user))
+      showSuccessMessage("Dados atualizados")
+      setTimeout(function(){
+        window.open("http://localhost:3000/home", '_self') 
+      }, 1000); 
+    })
+    .catch(erro =>
+    {        
+      showErrorMessage(erro.response)
+    });
+    
   }
 
   delete = async () =>{
     const user = JSON.parse(localStorage.getItem('@user'));
-    await axios.delete(`http://localhost:8080/api/user/${user.login}`)
-    .then(
-      alert("Dados deletados, Adeus ;("),
-      window.open("http://localhost:3000/login", '_self')
-    ).catch(erro =>{        
-      alert(erro.response)
-    }
-  );
+    this.service.delete(user.login)
+    .then(response =>{
+      showSuccessMessage("Dados deletados, Adeus ;(")
+      setTimeout(function(){
+        window.open("http://localhost:3000/login", '_self') 
+      }, 1000)
+    }).catch(erro =>{        
+      showErrorMessage(erro.response)
+    });
   }
 
   mount = () =>{

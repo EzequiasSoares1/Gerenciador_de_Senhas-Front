@@ -3,7 +3,8 @@ import './EditData.css';
 import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Button from '../../components/Button';
-import axios from 'axios';
+import { showErrorMessage, showSuccessMessage} from '../../components/Toastr';
+import DataApiService  from '../../services/DataApiService'
 
 export default class EditData extends React.Component {
   state = {
@@ -11,10 +12,28 @@ export default class EditData extends React.Component {
       email:"",
       password: "",
       observation: ""
-    }
+  }
+  constructor(){
+    super();
+    this.service = new DataApiService();
+  }
     
   check = () =>{
     return  this.state.password === "";
+  }
+
+  verify = () =>{
+    const erro = [];
+
+    if(this.state.email){
+     if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+       erro.push("Informe email valido");
+      }
+    }
+    if(!this.state.password){
+      erro.push("Campo password é obrigatorio");
+    }
+    return erro;
   }
 
   setData = (nameService, email, password, observation) =>{
@@ -26,7 +45,7 @@ export default class EditData extends React.Component {
     if(this.check()){
       const id = JSON.parse(localStorage.getItem('@data'));
 
-      await axios.get(`http://localhost:8080/api/data?id=${id}`)
+      this.service.find(id)
       .then(response =>
       {
         
@@ -36,7 +55,7 @@ export default class EditData extends React.Component {
       })
       .catch(erro =>
       {
-        alert("Dados não encontrados")
+        showErrorMessage("Dados não encontrados")
       });
     }
     
@@ -44,29 +63,34 @@ export default class EditData extends React.Component {
 
   update = async() =>{
 
-    if(this.check()){
-      alert("Verifique os campos");
-    } 
-    else{
-      const id = JSON.parse(localStorage.getItem('@data'));
-      const data = {
-        nameService: this.state.nameService,
-        email: this.state.email ,
-        password: this.state.password,
-        observation: this.state.observation
-      }
-      await axios.put(`http://localhost:8080/api/data/${id}`,data
-      )
-      .then(response =>{
-        alert("Dados cadastrados")
-        localStorage.setItem('@data', JSON.stringify(null))
-        window.open("http://localhost:3000/home", '_self') 
-      })
-      .catch(erro =>
-      {        
-        alert(erro.response)
+    const erro = this.verify();
+    if(erro.length > 0){
+      erro.forEach((message) =>{
+        showErrorMessage(message);
       });
+      return false;
+    } 
+    
+    const id = JSON.parse(localStorage.getItem('@data'));
+    const data = {
+      nameService: this.state.nameService,
+      email: this.state.email ,
+      password: this.state.password,
+      observation: this.state.observation
     }
+    this.service.update(`/${id}`,data)
+    .then(response =>{
+      localStorage.setItem('@data', JSON.stringify(null))
+      showSuccessMessage("Dados cadastrado com sucesso")
+      setTimeout(function(){
+        window.open("http://localhost:3000/home", '_self')
+      }, 1500)
+    })
+    .catch(erro =>
+    {        
+      showErrorMessage(erro.response)
+    });
+    
   }
   render(){
     this.seach()
@@ -87,11 +111,9 @@ export default class EditData extends React.Component {
           <Form label='Observation' htmlFor="InputObservation">
               <input type="Observation" className="form-control"  aria-describedby="ObservationHelp" placeholder="add note"
               defaultValue={this.state.observation} onChange={(v) =>{this.setState({observation: v.target.value })}}/>
-              </Form>
-              
+              </Form>    
           <Button  nameClass="btn btn-info" nameButton="Edit"  click={this.update} />
-         
-          </Header>
-    )
+        </Header>
+    );
   }
 }

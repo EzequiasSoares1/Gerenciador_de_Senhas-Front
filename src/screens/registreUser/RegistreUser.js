@@ -5,7 +5,9 @@ import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Button from '../../components/Button';
 import Footer from'../../components/Footer';
-import axios from 'axios';
+import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
+import UserApiService  from '../../services/UserApiService'
+
 
 export default class RegistreUser extends React.Component {
   state = {
@@ -14,27 +16,61 @@ export default class RegistreUser extends React.Component {
     password: "",
     telephone: ""
   }
-  
+  constructor(){
+    super();
+    this.service = new UserApiService();
+  }
+  verify = () =>{
+    const erro = [];
+
+    if(!this.state.name){
+      erro.push("Campo nome é obrigatorio");
+    }
+    if(!this.state.login){
+      erro.push("Campo email é obrigatorio");
+    } else if(!this.state.login.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+      erro.push("Informe email valido");
+    }
+    if(!this.state.password){
+      erro.push("Campo senha é obrigatorio");
+    }
+    return erro;
+  }
   create = async () =>{
-    const  user =  { 
+    const erro = this.verify();
+    if(erro.length > 0){
+      erro.forEach((message) =>{
+        showErrorMessage(message);
+      });
+      return false;
+    }
+    
+    const  user = 
+     { 
       name: this.state.name,
       login: this.state.login,
       password: this.state.password,
-      telephone: this.state.telephone,
-    };
-    
-   await axios.post('http://localhost:8080/api/user',user)
-   .then(response =>
-      {
-        localStorage.setItem('@user', JSON.stringify(user))
-        alert("Dados cadastrado com sucesso")
-        window.open("http://localhost:3000/home", '_self')
-      })
-    .catch(erro =>
-      {
-        alert("Verifique seus dados")
+      telephone: this.state.telephone
+    }
+    this.service.create(user)
+    .then(response =>
+        {
+          localStorage.setItem('@user', JSON.stringify(user))
+          showSuccessMessage("Dados cadastrado com sucesso")
+          setTimeout(function(){
+            window.open("http://localhost:3000/home", '_self')
+          }, 1500)
+        })
+      .catch(erro =>
+        {
+          if(erro.response.data === 'USER ALREADY EXISTS'){
+            showErrorMessage("Usuario já existe")
+          }else{
+            showErrorMessage("Verifique seus dados")
+         }
       }
-    );
+          
+      );
   }
     render(){
       return(

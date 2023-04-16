@@ -4,17 +4,41 @@ import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Footer from '../../components/Footer';
 import Button from '../../components/Button';
-import axios from 'axios';
+import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
+import UserApiService  from '../../services/UserApiService'
 
 export default class EditData extends React.Component {
-    state = {
-        serviceName:"",
-        email:"",
-        password: "",
-        observation: ""
-      }
+  state = {
+      serviceName:"",
+      email:"",
+      password: "",
+      observation: ""
+    }
+  constructor(){
+    super();
+    this.service = new UserApiService();
+  }
        
+  verify = () =>{
+    const erro = [];
+    if(this.state.email){
+      if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+        erro.push("Informe email valido");
+      }
+    } 
+    if(!this.state.password){
+      erro.push("Campo password é obrigatorio");
+    }
+    return erro;
+  } 
   create = async () =>{
+    const erro = this.verify();
+    if(erro.length > 0){
+      erro.forEach((message) =>{
+        showErrorMessage(message);
+      });
+      return false;
+    } 
     const user = JSON.parse(localStorage.getItem('@user'));
     var data =  { 
       name:user.name ,
@@ -30,14 +54,16 @@ export default class EditData extends React.Component {
       }]
     }    
     
-    axios.put(`http://localhost:8080/api/user/${user.login}`, data)
-    .then(
-
-      alert("Dados cadastrados"),
-      window.open("http://localhost:3000/home", '_self') 
-
-    ).catch(erro =>{
-        alert("Dados não cadastrados")
+    this.service.update(`/${user.login}`, data)
+    .then(Response =>{
+      showSuccessMessage("Dados cadastrados")
+      setTimeout(function(){
+        window.open("http://localhost:3000/home", '_self') 
+      }, 1000); 
+    
+    }).catch(erro =>{
+       showErrorMessage("Dados não cadastrados")
+       console.log(erro.response)
     });
   }
     
