@@ -87,9 +87,7 @@ export default class Main extends React.Component {
             <p>Click na linha a qual deseja alterar ou excluir</p>
           </div>
         <DataTable className="table" datas={this.state.data}/>
-          
       </body>
-      
       </>
     )
   }
