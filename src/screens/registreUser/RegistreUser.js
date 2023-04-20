@@ -6,8 +6,7 @@ import Form from '../../components/Form';
 import Button from '../../components/Button';
 import Footer from'../../components/Footer';
 import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
-import UserApiService  from '../../services/UserApiService'
-
+import UserApiService  from '../../services/UserApiService';
 
 export default class RegistreUser extends React.Component {
   state = {
@@ -55,7 +54,7 @@ export default class RegistreUser extends React.Component {
     this.service.create(user)
     .then(response =>
         {
-          localStorage.setItem('@user', JSON.stringify(user))
+          localStorage.setItem("@user", JSON.stringify(user));
           showSuccessMessage("Dados cadastrado com sucesso")
           setTimeout(function(){
             window.open("http://localhost:3000/home", '_self')

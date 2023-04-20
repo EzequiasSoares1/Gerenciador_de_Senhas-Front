@@ -5,7 +5,8 @@ import Form from '../../components/Form';
 import Footer from '../../components/Footer';
 import Button from '../../components/Button';
 import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
-import UserApiService  from '../../services/UserApiService'
+import UserApiService  from '../../services/UserApiService';
+
 
 export default class EditData extends React.Component {
   state = {
@@ -39,9 +40,10 @@ export default class EditData extends React.Component {
       });
       return false;
     } 
-    const user = JSON.parse(localStorage.getItem('@user'));
+    const user = JSON.parse(localStorage.getItem("@user"));
+    
     var data =  { 
-      name:user.name ,
+      name: user.name,
       login: user.login,
       password: user.password,
       telephone:  user.telephone,

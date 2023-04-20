@@ -1,13 +1,13 @@
 import React from 'react';
 import { showSuccessMessage } from './Toastr';
-
  
 const salve = (e) =>{
-    localStorage.setItem('@data', JSON.stringify(e))
+    localStorage.setItem("@data", JSON.stringify(e));
     showSuccessMessage("Linha selecionada")
 } 
 
 export default props => { 
+    
    
     const rows = props.datas.map( data =>{
         return(

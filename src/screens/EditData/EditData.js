@@ -4,7 +4,7 @@ import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Button from '../../components/Button';
 import { showErrorMessage, showSuccessMessage} from '../../components/Toastr';
-import DataApiService  from '../../services/DataApiService'
+import DataApiService  from '../../services/DataApiService';
 
 export default class EditData extends React.Component {
   state = {
@@ -17,7 +17,11 @@ export default class EditData extends React.Component {
     super();
     this.service = new DataApiService();
   }
-    
+
+  componentDidMount(){
+    this.seach();
+  }
+
   check = () =>{
     return  this.state.password === "";
   }
@@ -43,7 +47,7 @@ export default class EditData extends React.Component {
   seach = async() =>{
 
     if(this.check()){
-      const id = JSON.parse(localStorage.getItem('@data'));
+      const id = JSON.parse(localStorage.getItem("@data"));
 
       this.service.find(id)
       .then(response =>
@@ -71,7 +75,7 @@ export default class EditData extends React.Component {
       return false;
     } 
     
-    const id = JSON.parse(localStorage.getItem('@data'));
+    const id = JSON.parse(localStorage.getItem("@data"));
     const data = {
       nameService: this.state.nameService,
       email: this.state.email ,
@@ -80,7 +84,7 @@ export default class EditData extends React.Component {
     }
     this.service.update(`/${id}`,data)
     .then(response =>{
-      localStorage.setItem('@data', JSON.stringify(null))
+      localStorage.setItem("@data",null)
       showSuccessMessage("Dados cadastrado com sucesso")
       setTimeout(function(){
         window.open("http://localhost:3000/home", '_self')
@@ -93,7 +97,6 @@ export default class EditData extends React.Component {
     
   }
   render(){
-    this.seach()
     return(
         <Header title="Edit Password" p="Atualize as informações">
           <Form label='Service Name' htmlFor="InputText">

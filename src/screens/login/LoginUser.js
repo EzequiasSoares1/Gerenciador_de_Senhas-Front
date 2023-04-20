@@ -6,8 +6,7 @@ import Form from '../../components/Form';
 import Button from '../../components/Button';
 import Footer from'../../components/Footer';
 import { showErrorMessage } from '../../components/Toastr';
-import UserApiService  from '../../services/UserApiService'
-
+import UserApiService  from '../../services/UserApiService';
 
 export default class Login extends React.Component {
   
@@ -54,8 +53,8 @@ export default class Login extends React.Component {
       const user = response.data;
       
       if(this.check(user.login, user.password)){
-        localStorage.setItem('@user', JSON.stringify(user))
-        window.open("http://localhost:3000/home", '_self')   
+        localStorage.setItem('@user', JSON.stringify(user));
+        window.open("http://localhost:3000/home", '_self')
       }
       else{
         showErrorMessage("Usuario não encontrado")

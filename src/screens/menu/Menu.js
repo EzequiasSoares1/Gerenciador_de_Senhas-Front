@@ -5,7 +5,6 @@ import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
 import DataApiService  from '../../services/DataApiService'
 import UserApiService  from '../../services/UserApiService'
 
-
 export default class Main extends React.Component {
   state = {
     data: [],
@@ -18,18 +17,25 @@ export default class Main extends React.Component {
     this.serviceData = new DataApiService();
   }
 
+  componentDidMount(){
+    this.getData();
+  }
+  logout(){
+    localStorage.setItem("@user", null);
+    localStorage.setItem("@data", null);
+    window.open("http://localhost:3000/login", '_self')
+  }
+
   getData = async() =>{
     if(!this.state.load){
-
-      localStorage.setItem('@data', JSON.stringify(null))
-      const login = JSON.parse(localStorage.getItem('@user')).login;
-
+      localStorage.setItem("@data", null);
+      const login = JSON.parse(localStorage.getItem("@user")).login;
       this.serviceUser.find(login)
       .then(response =>
       {
         const data = response.data.dataService;
         this.setState({ data })
-        this.setState({load: "retggerg"});
+        this.setState({load: "true"});
       })
       .catch(erro =>
       {
@@ -39,7 +45,7 @@ export default class Main extends React.Component {
   }
   
   checkerIsId = () =>{
-    const id = JSON.parse(localStorage.getItem('@data'));
+    const id = JSON.parse(localStorage.getItem("@data"));
     return id === null;
   }
   
@@ -53,32 +59,25 @@ export default class Main extends React.Component {
   }
 
   deleteData = () =>{
-   
     if(this.checkerIsId()){
       showErrorMessage("Selecione uma linha da tabela")
     }else{
-      const id = JSON.parse(localStorage.getItem('@data')); 
+
+      const id = JSON.parse(localStorage.getItem("@data")); 
       this.serviceData.delete(id)
       .then(response => {
         showSuccessMessage("Senha excluida");
         setTimeout(function(){
           window.location.reload()
         }, 1000);
-      }
-      ).catch(error => {
+      })
+      .catch(error => {
           console.log(error.response);
-      }
-      );
+      });
     }
-  }
-
-  logout = () =>{
-    localStorage.setItem('@data', JSON.stringify(null))
-    localStorage.setItem('@user', JSON.stringify(null))
   }
   
   render(){
-    this.getData();
     return(
       <><div className="navbar_menu">
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
