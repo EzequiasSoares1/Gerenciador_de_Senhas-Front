@@ -4,7 +4,6 @@ export default class DataApiService extends ApiService{
     constructor(){
         super('/data')
     }
-
     create(object){
         return this.post('',object);
     }

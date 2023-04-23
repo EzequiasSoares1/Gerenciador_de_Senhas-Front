@@ -23,7 +23,7 @@ export default class EditData extends React.Component {
   verify = () =>{
     const erro = [];
     if(this.state.email){
-      if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+      if(!this.state.email.match(/^\S+@\S+\.\S+$/)){
         erro.push("Informe email valido");
       }
     } 

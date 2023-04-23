@@ -5,35 +5,24 @@ import Header from '../../components/Header';
 import Form from '../../components/Form';
 import Button from '../../components/Button';
 import Footer from'../../components/Footer';
-import { showErrorMessage } from '../../components/Toastr';
-import UserApiService  from '../../services/UserApiService';
+import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
+import { AuthContext } from '../../main/SessionProvider';
 
-export default class Login extends React.Component {
+  class Login extends React.Component {
   
   state = {
-      email:"",
-      password: "",
-  }
-
-  check = (log,pass) =>{
-    return this.state.email === log && this.state.password === pass;
-  }
-  constructor(){
-    super();
-    this.service = new UserApiService();
-  }
+      username:"",
+      password: ""
+  }  
     
   verify = () =>{
     const erro = [];
 
-    if(!this.state.email){
-      erro.push("Campo email é obrigatorio");
-    } 
-    else if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
-      erro.push("Informe email valido");
+    if(!this.state.username){
+      erro.push("Campo Username é obrigatorio");
     }
     if(!this.state.password){
-      erro.push("Campo password é obrigatorio");
+      erro.push("Campo Password é obrigatorio");
     }
     return erro;
   }
@@ -46,19 +35,17 @@ export default class Login extends React.Component {
       });
       return false;
     } 
-    
-   this.service.findNoData(this.state.email)
-    .then(response =>
+
+    this.context.login(
+      this.state.username,
+      this.state.password
+    ).then(response =>
     {
-      const user = response.data;
-      
-      if(this.check(user.login, user.password)){
-        localStorage.setItem('@user', JSON.stringify(user));
+      showSuccessMessage(`${response.name}, você está logado!`);
+      setTimeout(function(){
         window.open("http://localhost:3000/home", '_self')
-      }
-      else{
-        showErrorMessage("Usuario não encontrado")
-      }
+      }, 1500)
+
     }).catch(erro =>{
       showErrorMessage("Usuario não encontrado")
       console.log(erro.response)
@@ -66,13 +53,14 @@ export default class Login extends React.Component {
     
   }
     render(){
+
       return(
           <Header title="Login" p="Welcome Back!">
            
-            <Form label='Email' htmlFor="InputEmail">
-              <input type="email" className="form-control"  aria-describedby="emailHelp" placeholder="email@email.com"
-              defaultValue={this.state.email} onChange={(v) =>{this.setState({email: v.target.value })}}/>
-              <small id="emailHelp" className="form-text text-muted">Enter your email to get started</small>
+            <Form label='UserName' htmlFor="InputUserName">
+              <input type="text" className="form-control" placeholder="UserName@74"
+              defaultValue={this.state.username} onChange={(v) =>{this.setState({username: v.target.value })}}/>
+              <small id="help" className="form-text text-muted">Enter registered username</small>
               </Form>
 
             <Form label='Password' htmlFor="InputPassword">
@@ -80,7 +68,7 @@ export default class Login extends React.Component {
                 defaultValue={this.state.password} onChange={(v) =>{this.setState({password: v.target.value })}}/>
               </Form>
 
-            <Button  nameClass="btn btn-success" nameButton="Sign in" icon={icon} click= {this.seach}/>
+            <Button  nameClass="btn btn-success" nameButton="Sign in" icon={icon} click= {this.seach} />
             
             <Footer msg = "Don't have an account yet? ">
               <a href="/createUser">Register</a>
@@ -90,3 +78,5 @@ export default class Login extends React.Component {
       )
     }
 }
+Login.contextType = AuthContext;
+export default Login;

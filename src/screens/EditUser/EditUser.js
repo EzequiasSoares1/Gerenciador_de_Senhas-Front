@@ -11,7 +11,7 @@ import { showErrorMessage, showSuccessMessage} from '../../components/Toastr';
 export default class EditUser extends React.Component {
 
   state = {
-    name: "",
+    username: "",
     password: "",
     telephone: ""
   }
@@ -22,18 +22,15 @@ export default class EditUser extends React.Component {
   componentWillMount(){
     this.seach()
   }
-  check = () =>{
-    return this.state.name === ""  || this.state.password === "";
-  }
 
   setData = (name, password, telephone) =>{
-    this.setState({name: name,  password:password, telephone:telephone});
+    this.setState({username: name,  password:password, telephone:telephone});
   }
   
   verify = () =>{
     const erro = [];
 
-    if(!this.state.name){
+    if(!this.state.username){
       erro.push("Campo nome é obrigatorio");
     }
     if(!this.state.password){
@@ -44,7 +41,7 @@ export default class EditUser extends React.Component {
 
   seach = async() =>{
 
-    if(this.state.name === ""){
+    if(this.state.username === ""){
       const user = JSON.parse(localStorage.getItem("@user"));
 
       this.service.findNoData(user.login)
@@ -74,7 +71,7 @@ export default class EditUser extends React.Component {
     const login = JSON.parse(localStorage.getItem("@user")).login;
 
     const user = {
-      name: this.state.name,
+      name: this.state.username,
       login: login,
       password: this.state.password,
       telephone: this.state.telephone
@@ -118,9 +115,10 @@ export default class EditUser extends React.Component {
     
     return(
       <Header title="Edit Account" p="insert new data">
-      <Form label='Name' htmlFor="InputName">
+      <Form label='Username' htmlFor="InputName">
         <input type="text" className="form-control"  placeholder='Enter you name' 
-        defaultValue={this.state.name} onChange={(v) =>{this.setState({name: v.target.value })}}/>
+        defaultValue={this.state.username} onChange={(v) =>{this.setState({username: v.target.value })}}/>
+        <small id="help" className="form-text text-muted">Remember that This username will be used to login!!!</small>
       </Form>
 
       <Form label='Password' htmlFor="InputPassword">

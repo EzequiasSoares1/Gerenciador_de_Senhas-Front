@@ -10,7 +10,7 @@ import UserApiService  from '../../services/UserApiService';
 
 export default class RegistreUser extends React.Component {
   state = {
-    name: "",
+    username: "",
     login:"",
     password: "",
     telephone: ""
@@ -18,16 +18,17 @@ export default class RegistreUser extends React.Component {
   constructor(){
     super();
     this.service = new UserApiService();
+    
   }
   verify = () =>{
     const erro = [];
 
-    if(!this.state.name){
+    if(!this.state.username){
       erro.push("Campo nome é obrigatorio");
     }
     if(!this.state.login){
       erro.push("Campo email é obrigatorio");
-    } else if(!this.state.login.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+    } else if(!this.state.login.match(/^\S+@\S+\.\S+$/)){
       erro.push("Informe email valido");
     }
     if(!this.state.password){
@@ -46,7 +47,7 @@ export default class RegistreUser extends React.Component {
     
     const  user = 
      { 
-      name: this.state.name,
+      name: this.state.username,
       login: this.state.login,
       password: this.state.password,
       telephone: this.state.telephone
@@ -54,7 +55,6 @@ export default class RegistreUser extends React.Component {
     this.service.create(user)
     .then(response =>
         {
-          localStorage.setItem("@user", JSON.stringify(user));
           showSuccessMessage("Dados cadastrado com sucesso")
           setTimeout(function(){
             window.open("http://localhost:3000/home", '_self')
@@ -75,9 +75,11 @@ export default class RegistreUser extends React.Component {
       return(
           <Header title="Create Account" p="Welcome, insert your data">
 
-            <Form label='Name' htmlFor="InputName">
-              <input type="text" className="form-control"  placeholder='Enter you name' 
-              defaultValue={this.state.name} onChange={(v) =>{this.setState({name: v.target.value })}}/>
+            <Form label='Username' htmlFor="InputName">
+              <input type="text" className="form-control"  placeholder='Enter you username' 
+              defaultValue={this.state.username} onChange={(v) =>{this.setState({username: v.target.value })}}/>
+              <small id="emailHelp" className="form-text text-muted">This name will be used to login</small>
+
             </Form>
 
             <Form label='Email' htmlFor="InputEmail">
@@ -99,7 +101,7 @@ export default class RegistreUser extends React.Component {
             <Button  nameClass="btn btn-danger" nameButton="Sign up" icon={icon} click={this.create}/>
 
             <Footer msg = "Already have an account: ">
-              <a href="/login">Sign in</a>
+              <a href="/">Sign in</a>
               </Footer>
           </Header>
       )
