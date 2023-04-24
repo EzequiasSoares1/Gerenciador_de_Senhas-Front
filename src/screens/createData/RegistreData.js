@@ -27,6 +27,9 @@ export default class EditData extends React.Component {
         erro.push("Informe email valido");
       }
     } 
+    if(!this.state.serviceName){
+      erro.push("Campo service é obrigatorio");
+    }
     if(!this.state.password){
       erro.push("Campo password é obrigatorio");
     }

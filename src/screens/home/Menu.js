@@ -21,8 +21,9 @@ export default class Main extends React.Component {
   componentDidMount(){
     this.getData();
   }
+  
   logout(){
-    this.autentication.logout();
+    localStorage.clear();
     window.open("http://localhost:3000/login", '_self')
   }
 

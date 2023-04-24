@@ -22,20 +22,19 @@ export default class EditData extends React.Component {
     this.seach();
   }
 
-  check = () =>{
-    return  this.state.password === "";
-  }
-
   verify = () =>{
     const erro = [];
 
     if(this.state.email){
-     if(this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+     if(!this.state.email.match(/^\S+@\S+\.\S+$/)){
        erro.push("Informe email valido");
       }
     }
     if(!this.state.password){
       erro.push("Campo password é obrigatorio");
+    }
+    if(!this.state.nameService){
+      erro.push("Campo service é obrigatorio");
     }
     return erro;
   }
@@ -46,7 +45,6 @@ export default class EditData extends React.Component {
 
   seach = async() =>{
 
-    if(this.check()){
       const id = JSON.parse(localStorage.getItem("@data"));
 
       this.service.find(id)
@@ -61,7 +59,7 @@ export default class EditData extends React.Component {
       {
         showErrorMessage("Dados não encontrados")
       });
-    }
+    
     
   }
 
@@ -78,9 +76,9 @@ export default class EditData extends React.Component {
     const id = JSON.parse(localStorage.getItem("@data"));
     const data = {
       nameService: this.state.nameService,
-      email: this.state.email ,
-      password: this.state.password,
-      observation: this.state.observation
+      email: this.state.email ? this.state.email: "",
+      password:  this.state.password,
+      observation: this.state.observation ? this.state.observation: ""
     }
     this.service.update(`/${id}`,data)
     .then(response =>{
