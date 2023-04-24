@@ -30,7 +30,7 @@ export default class EditData extends React.Component {
     const erro = [];
 
     if(this.state.email){
-     if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+     if(this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
        erro.push("Informe email valido");
       }
     }

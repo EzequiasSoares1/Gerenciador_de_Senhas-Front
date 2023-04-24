@@ -14,16 +14,14 @@ import { AuthContext } from '../../main/SessionProvider';
       username:"",
       password: ""
   }  
-    
+
   verify = () =>{
     const erro = [];
 
     if(!this.state.username){
       erro.push("Campo Username é obrigatorio");
     }
-    if(!this.state.password){
-      erro.push("Campo Password é obrigatorio");
-    }
+    
     return erro;
   }
 

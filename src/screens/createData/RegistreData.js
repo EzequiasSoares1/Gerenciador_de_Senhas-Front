@@ -40,7 +40,7 @@ export default class EditData extends React.Component {
       });
       return false;
     } 
-    const user = JSON.parse(localStorage.getItem("@user"));
+    const user = JSON.parse(localStorage.getItem("loggedUser"));
     
     var data =  { 
       name: user.name,
@@ -56,7 +56,7 @@ export default class EditData extends React.Component {
       }]
     }    
     
-    this.service.update(`/${user.login}`, data)
+    this.service.update(user.login, data)
     .then(Response =>{
       showSuccessMessage("Dados cadastrados")
       setTimeout(function(){

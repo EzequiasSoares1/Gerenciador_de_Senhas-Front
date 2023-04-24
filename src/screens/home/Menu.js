@@ -2,46 +2,44 @@ import React from 'react';
 import DataTable from '../../components/dataTable';
 import "./Menu.css";
 import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
-import DataApiService  from '../../services/DataApiService'
-import UserApiService  from '../../services/UserApiService'
+import DataApiService  from '../../services/DataApiService';
+import UserApiService  from '../../services/UserApiService';
+import AuthenticationApiService from '../../services/AuthenticationApiService';
 
 export default class Main extends React.Component {
   state = {
-    data: [],
-    load: ""
+    data: []
   }
 
   constructor(){
     super();
     this.serviceUser = new UserApiService();
     this.serviceData = new DataApiService();
+    this.autentication = new AuthenticationApiService();
   }
 
   componentDidMount(){
     this.getData();
   }
   logout(){
-    localStorage.setItem("@user", null);
-    localStorage.setItem("@data", null);
+    this.autentication.logout();
     window.open("http://localhost:3000/login", '_self')
   }
 
   getData = async() =>{
-    if(!this.state.load){
       localStorage.setItem("@data", null);
-      const login = JSON.parse(localStorage.getItem("@user")).login;
+      const login = JSON.parse(localStorage.getItem("loggedUser")).login;
       this.serviceUser.find(login)
       .then(response =>
       {
         const data = response.data.dataService;
         this.setState({ data })
-        this.setState({load: "true"});
       })
       .catch(erro =>
       {
         console.log(erro.response)
       }); 
-    }
+    
   }
   
   checkerIsId = () =>{

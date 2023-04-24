@@ -7,8 +7,10 @@ import Button from '../../components/Button';
 import Footer from'../../components/Footer';
 import { showErrorMessage, showSuccessMessage } from '../../components/Toastr';
 import UserApiService  from '../../services/UserApiService';
+import { AuthContext } from '../../main/SessionProvider';
+import StorageService  from '../../services/StorageService';
 
-export default class RegistreUser extends React.Component {
+class RegistreUser extends React.Component {
   state = {
     username: "",
     login:"",
@@ -18,6 +20,7 @@ export default class RegistreUser extends React.Component {
   constructor(){
     super();
     this.service = new UserApiService();
+    this.storage = new StorageService();
     
   }
   verify = () =>{
@@ -36,8 +39,9 @@ export default class RegistreUser extends React.Component {
     }
     return erro;
   }
+  
   create = async () =>{
-    const erro = this.verify();
+     const erro = this.verify();
     if(erro.length > 0){
       erro.forEach((message) =>{
         showErrorMessage(message);
@@ -52,24 +56,22 @@ export default class RegistreUser extends React.Component {
       password: this.state.password,
       telephone: this.state.telephone
     }
-    this.service.create(user)
+    await this.service.create(user)
     .then(response =>
-        {
-          showSuccessMessage("Dados cadastrado com sucesso")
-          setTimeout(function(){
-            window.open("http://localhost:3000/home", '_self')
-          }, 1500)
-        })
-      .catch(erro =>
+      {
+       showSuccessMessage(`${response.data.name}, sua conta está cadastrada!`);
+       setTimeout(function(){
+        window.open("http://localhost:3000/", '_self')
+       }, 1500)
+      }
+    ).catch(erro =>
         {
           if(erro.response.data === 'USER ALREADY EXISTS'){
             showErrorMessage("Usuario já existe")
           }else{
-            showErrorMessage("Verifique seus dados")
+            showErrorMessage(erro.response)
          }
-      }
-          
-      );
+      });
   }
     render(){
       return(
@@ -107,3 +109,6 @@ export default class RegistreUser extends React.Component {
       )
     }
 }
+
+RegistreUser.contextType = AuthContext;
+export default RegistreUser;

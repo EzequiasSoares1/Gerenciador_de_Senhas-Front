@@ -7,24 +7,26 @@ import Button from '../../components/Button';
 import Footer from'../../components/Footer';
 import UserApiService  from '../../services/UserApiService'
 import { showErrorMessage, showSuccessMessage} from '../../components/Toastr';
+import AuthenticationApiService from '../../services/AuthenticationApiService';
 
 export default class EditUser extends React.Component {
 
   state = {
     username: "",
-    password: "",
+    password: "minhaSenha",
     telephone: ""
   }
   constructor(){
     super();
     this.service = new UserApiService(); 
+    this.autentication = new AuthenticationApiService();
   }
   componentWillMount(){
     this.seach()
   }
 
-  setData = (name, password, telephone) =>{
-    this.setState({username: name,  password:password, telephone:telephone});
+  setData = (name, telephone) =>{
+    this.setState({username: name, telephone:telephone});
   }
   
   verify = () =>{
@@ -32,23 +34,23 @@ export default class EditUser extends React.Component {
 
     if(!this.state.username){
       erro.push("Campo nome é obrigatorio");
-    }
-    if(!this.state.password){
+    }if(!this.state.password){
       erro.push("Campo password é obrigatorio");
     }
+   
     return erro;
   }
 
   seach = async() =>{
 
     if(this.state.username === ""){
-      const user = JSON.parse(localStorage.getItem("@user"));
+      const user = JSON.parse(localStorage.getItem("loggedUser"));
 
       this.service.findNoData(user.login)
       .then(response =>
       {
         const userdt = response.data;
-        this.setData(userdt.name, userdt.password, userdt.telephone)
+        this.setData(userdt.name, userdt.telephone)
       })
       .catch(erro =>
       {
@@ -59,7 +61,6 @@ export default class EditUser extends React.Component {
   }
 
   update = async() =>{
-
     const erro = this.verify();
     if(erro.length > 0){
       erro.forEach((message) =>{
@@ -67,20 +68,19 @@ export default class EditUser extends React.Component {
       });
       return false;
     } 
+    const login = JSON.parse(localStorage.getItem("loggedUser"));
+
+    let user = {
+          name: this.state.username,
+          login: login.login,
+          telephone: this.state.telephone,
+          password: this.state.password,
+          dataService:[]
+      }
    
-    const login = JSON.parse(localStorage.getItem("@user")).login;
-
-    const user = {
-      name: this.state.username,
-      login: login,
-      password: this.state.password,
-      telephone: this.state.telephone
-    }
-
-    this.service.update(`/${login}`,user)
+    this.service.update(login.login, user)
     .then(response =>{
-
-      localStorage.setItem("@user", JSON.stringify(user));
+      
       showSuccessMessage("Dados atualizados");
 
       setTimeout(function(){
@@ -90,21 +90,21 @@ export default class EditUser extends React.Component {
     })
     .catch(erro =>
     {        
-      showErrorMessage(erro.response)
+      showErrorMessage(erro)
     });
     
   }
 
   delete = async () =>{
-
-    const user = JSON.parse(localStorage.getItem("@user"));
+   
+    const user = JSON.parse(localStorage.getItem("loggedUser"));
     this.service.delete(user.login)
     .then(response =>{
-
       showSuccessMessage("Dados deletados, Adeus ;(")
+      this.autentication.logout();
       setTimeout(function(){
-        window.open("http://localhost:3000/login", '_self') 
-      }, 1000)
+        window.open("http://localhost:3000/", '_self') 
+      }, 1500)
 
     }).catch(erro =>
       {        
