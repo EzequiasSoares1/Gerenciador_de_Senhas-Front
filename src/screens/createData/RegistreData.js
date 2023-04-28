@@ -48,7 +48,7 @@ export default class EditData extends React.Component {
     var data =  { 
       name: user.name,
       login: user.login,
-      password: user.password,
+      password:"minhaSenha",
       telephone:  user.telephone,
       dataService:[{
         id:0,

@@ -14,7 +14,13 @@ import { AuthContext } from '../../main/SessionProvider';
       username:"",
       password: ""
   }  
-
+  componentDidMount(){
+    localStorage.setItem("loggedUser", null);
+    localStorage.setItem("user", null);
+    localStorage.setItem("@data", null);
+    localStorage.setItem("token", null);
+  }
+  
   verify = () =>{
     const erro = [];
 

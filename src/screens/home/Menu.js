@@ -23,7 +23,9 @@ export default class Main extends React.Component {
   }
   
   logout(){
-    localStorage.clear();
+    localStorage.setItem("loggedUser", null);
+    localStorage.setItem("user", null);
+    localStorage.setItem("@data", null);
     window.open("http://localhost:3000/login", '_self')
   }
 
